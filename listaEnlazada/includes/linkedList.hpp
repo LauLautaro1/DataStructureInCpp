@@ -3,6 +3,7 @@
 
 #include "node.hpp"
 #include <stdexcept>
+#include <sstream>
 
 template<typename T>
 class LinkedList{
@@ -110,5 +111,24 @@ class LinkedList{
             delete current;
             return;
         }
+
+        std::string toString() const{
+            std::ostringstream txt;
+            Node<T>* current = first;
+            bool firstElement = true;
+
+            while (current != nullptr) {
+                if (!firstElement) {
+                    txt << " <-> ";
+                }  
+                txt << "[";
+                txt << current->date;
+                current = current->following;
+                firstElement = false;
+                txt<< "]";
+            }
+            return txt.str();
+        }
+
 };
 #endif
