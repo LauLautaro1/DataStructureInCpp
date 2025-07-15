@@ -10,6 +10,8 @@ class LinkedList{
         Node<T> first;
         Node<T> last;
 
+        Node<T>* getRecursive(Node<T>* node ,int currentIndex , int indexObjetive);
+
     public:
         LinkedList();
 
@@ -19,11 +21,11 @@ class LinkedList{
 
         void addFirst(const T& date);
 
-        T get(int index);
+        T* get(int index);
 
-        T getFirst();
+        T* getFirst();
 
-        T getLast();
+        T* getLast();
 
         int size();
 };
