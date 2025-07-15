@@ -26,19 +26,17 @@ class LinkedList{
         }
 
         void add(const T& date){
-            Node<T>* nodeNew = new Node<T>(date,nullptr,nullptr);
+            Node<T>* nodeNew = new Node<T>(date,last,nullptr);
             _size +=1;
 
-            if (last != nullptr) {
+            if (last == nullptr) {
+                first = last = nodeNew;
+            } else {
                 last->following = nodeNew;
-            } if(first == nullptr){
-                first = nodeNew;
                 last = nodeNew;
             }
 
-            last = nodeNew;
         }
-
         void addFirst(const T& date){
             Node<T>* nodeNew = new Node<T>(date , nullptr , nullptr);
             _size +=1;
@@ -106,8 +104,6 @@ class LinkedList{
                     last->following = nullptr;
                     }
             }
-
-
             //eliminar nodo intermedio
             else{
                 current->former->following = current->following;
