@@ -38,18 +38,15 @@ class LinkedList{
 
         }
         void addFirst(const T& date){
-            Node<T>* nodeNew = new Node<T>(date , nullptr , nullptr);
+            Node<T>* nodeNew = new Node<T>(date , nullptr , first);
             _size +=1;
             if(first == nullptr){
                 first = nodeNew;
                 last = nodeNew;
                 return;
             }
-            Node<T>* firstCurrent = first;
-            first = nullptr;
+            first->former = nodeNew;
             first = nodeNew;
-            nodeNew->following = firstCurrent;
-            firstCurrent = nullptr;
             return;
         }
 
