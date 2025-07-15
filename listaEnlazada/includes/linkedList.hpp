@@ -33,6 +33,7 @@ class LinkedList{
                 last->following = nodeNew;
             } if(first == nullptr){
                 first = nodeNew;
+                last = nodeNew;
             }
 
             last = nodeNew;
@@ -43,6 +44,7 @@ class LinkedList{
             _size +=1;
             if(first == nullptr){
                 first = nodeNew;
+                last = nodeNew;
                 return;
             }
             Node<T>* firstCurrent = first;
@@ -74,6 +76,46 @@ class LinkedList{
 
         int size(){
             return _size;
+        }
+
+        void removeAt(int index){
+            if (index < 0 || index >= _size) throw std::out_of_range("el index no es el correcto.");
+            if(first == nullptr) throw std::out_of_range("No hay elementos en la lista.");
+
+            Node<T>* current = first;
+
+            for (int i=0;current != nullptr && i<index ;++i){
+                current = current->following;
+            }
+
+            //Eliminar el unico nodo
+            if(first == last){
+                first = nullptr;
+                last = nullptr;
+            }
+            //Eliminar primer nodo
+            else if(current == first){
+                first = first->following;
+                first->former = nullptr;
+            }
+            //Eliminar ultimo nodo.
+            
+            else if (current == last) {
+                last = last->former;
+                if (last != nullptr) {
+                    last->following = nullptr;
+                    }
+            }
+
+
+            //eliminar nodo intermedio
+            else{
+                current->former->following = current->following;
+                current->following->former = current->former;
+            }
+            _size -=1;
+            delete current;
+            return;
         }
 };
 #endif

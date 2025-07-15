@@ -1,5 +1,6 @@
 #include "../includes/linkedList.hpp"
 #include <iostream>
+#include <string>
 
 using namespace std;
 
@@ -15,7 +16,12 @@ int main(){
     lista.add(9000);
     lista.add(10);
 
+    lista.removeAt(1);
+
+    lista.removeAt(3);
+
     int a = lista.getFirst();
+
     lista.addFirst(1);
 
 
@@ -29,6 +35,11 @@ int main(){
 
     cout<<"Dato : "<<lista.get(0)<<endl;
 
+    LinkedList<string> l2;
+
+    l2.add("Hola");
+
+    cout<<"Dato : " << l2.getFirst()<<endl;
 
     return 0;
 }
