@@ -139,6 +139,10 @@ public:
         this->get(index) = elem;
     }
 
+    void insertAt(int index , T&& elem){
+        this->get(index) = elem;
+    }
+
     void push_back(const T& elem){add(elem);}
 
     void push_back(T&& elem){add(std::move(elem));}
@@ -261,9 +265,18 @@ public:
         if (index < 0 || index >= _size) throw std::out_of_range("Invalid index");
         if (head == nullptr) throw std::out_of_range("Empty list");
 
-        Node<T>* current = head;
-        for (int i = 0; current != nullptr && i < index; ++i) {
-            current = current->next;
+        Node<T>* current;
+
+        if(index <= _size / 2){
+            current = head;
+            for (int i = 0; current != nullptr && i < index; ++i) {
+                current = current->next;
+            }
+        }else{
+            current = tail;
+            for (int i = _size-1;current != nullptr && i > index; --i){
+                current = current->prev;
+            }
         }
 
         // Caso 1: Único nodo
