@@ -13,5 +13,16 @@ int main(){
     lista.add(33);
     lista.add(80);
 
-    cout<<lista.toString();
+    lista.removeAt(3);
+
+    lista.addFirst(1);
+
+    cout<<lista.toString()<<endl;
+
+    lista.addFirst(2);
+
+    lista.clear();
+
+    cout<<lista.toString()<<endl;
+
 }

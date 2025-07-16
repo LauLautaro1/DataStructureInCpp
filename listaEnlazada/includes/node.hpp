@@ -4,11 +4,11 @@
 template<typename T>
 struct Node{
     T date;
-    Node<T>* former;
-    Node<T>* following;
+    Node<T>* prev;
+    Node<T>* next;
 
-    Node(const T& val, Node<T>* prev, Node<T>* next)
-        : date(val), former(prev), following(next) {}
+    Node(const T& date, Node<T>* prev, Node<T>* next)
+        : date(date), prev(prev), next(next) {}
 };
 
 #endif

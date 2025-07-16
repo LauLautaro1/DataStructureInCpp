@@ -6,129 +6,162 @@
 #include <sstream>
 
 template<typename T>
-class LinkedList{
-    private:
-        int _size;
-        Node<T>* first;
-        Node<T>* last;
+class LinkedList {
+private:
+    int _size;
+    Node<T>* head;
+    Node<T>* tail;
 
-    public:
-        
-        LinkedList() : _size(0), first(nullptr), last(nullptr) {}
+public:
 
-        ~LinkedList(){
-            Node<T>* current = first;
-            while (current != nullptr) {
-            Node<T>* following = current->following;
-            delete current;
-            current = nullptr;
-            current = following;
+    //----- Constructor y Destructor -----
+    LinkedList() : _size(0), head(nullptr), tail(nullptr) {}
+
+    ~LinkedList() {
+        clear();
+    }
+
+    //----- Operaciones Básicas -----
+    int size() const {
+        return _size;
+    }
+
+    bool contains(T elem) {
+        Node<T>* current = head;
+        while (current != nullptr) {
+            if (current->date == elem) {
+                return true;
             }
+            current = current->next;
         }
+        return false;
+    }
 
-        void add(const T& date){
-            Node<T>* nodeNew = new Node<T>(date,last,nullptr);
-            _size +=1;
-
-            if (last == nullptr) {
-                first = last = nodeNew;
-            } else {
-                last->following = nodeNew;
-                last = nodeNew;
+    int indexOf(T elem) {
+        Node<T>* current = head;
+        int index = 0;
+        while (current != nullptr) {
+            if (current->date == elem) {
+                return index;
             }
-
+            current = current->next;
+            index++;
         }
-        void addFirst(const T& date){
-            Node<T>* nodeNew = new Node<T>(date , nullptr , first);
-            _size +=1;
-            if(first == nullptr){
-                first = nodeNew;
-                last = nodeNew;
-                return;
-            }
-            first->former = nodeNew;
-            first = nodeNew;
+        throw std::out_of_range("Element not found in the list");
+    }
+
+    //----- Añadir Elementos -----
+    void add(const T& date) {
+        Node<T>* newNode = new Node<T>(date, tail, nullptr);
+        _size++;
+
+        if (tail == nullptr) {
+            head = tail = newNode;
+        } else {
+            tail->next = newNode;
+            tail = newNode;
+        }
+    }
+
+    void addFirst(const T& date) {
+        Node<T>* newNode = new Node<T>(date, nullptr, head);
+        _size++;
+        if (head == nullptr) {
+            head = tail = newNode;
             return;
         }
+        head->prev = newNode;
+        head = newNode;
+    }
 
-        T& get(int index) const {
-            if (index < 0 || index >= _size) throw std::out_of_range("el index no es el correcto.");
-            Node<T>* current = first;
-            for (int i = 0; current != nullptr && i < index; ++i) {
-                current = current->following;
-            }
-            return current->date;
+    void set(int index, const T& elem) {
+        this->get(index) = elem;
+    }
+
+    //----- Obtener Elementos -----
+    T& get(int index) const {
+        if (index < 0 || index >= _size) throw std::out_of_range("Invalid index");
+        Node<T>* current = head;
+        for (int i = 0; current != nullptr && i < index; ++i) {
+            current = current->next;
+        }
+        return current->date;
+    }
+
+    T& getFirst() {
+        if (head == nullptr) throw std::out_of_range("Empty list: no head element");
+        return head->date;
+    }
+
+    T& getLast() {
+        if (tail == nullptr) throw std::out_of_range("Empty list: no tail element");
+        return tail->date;
+    }
+
+    //----- Eliminar Elementos -----
+    void removeAt(int index) {
+        if (index < 0 || index >= _size) throw std::out_of_range("Invalid index");
+        if (head == nullptr) throw std::out_of_range("Empty list");
+
+        Node<T>* current = head;
+        for (int i = 0; current != nullptr && i < index; ++i) {
+            current = current->next;
         }
 
-        T& getFirst(){
-            if (first == nullptr) throw std::out_of_range("Lista vacía: no hay primer elemento");
-            return first->date;
+        // Caso 1: Único nodo
+        if (head == tail) {
+            head = nullptr;
+            tail = nullptr;
+        }
+        // Caso 2: Eliminar head
+        else if (current == head) {
+            head = head->next;
+            head->prev = nullptr;
+        }
+        // Caso 3: Eliminar tail
+        else if (current == tail) {
+            tail = tail->prev;
+            if (tail != nullptr) {
+                tail->next = nullptr;
+            }
+        }
+        // Caso 4: Nodo intermedio
+        else {
+            current->prev->next = current->next;
+            current->next->prev = current->prev;
         }
 
-        T& getLast(){
-            if (last == nullptr) throw std::out_of_range("Lista vacía: no hay último elemento");
-            return last->date;
-        }
+        _size--;
+        delete current;
+    }
 
-        int size(){
-            return _size;
-        }
-
-        void removeAt(int index){
-            if (index < 0 || index >= _size) throw std::out_of_range("el index no es el correcto.");
-            if(first == nullptr) throw std::out_of_range("No hay elementos en la lista.");
-
-            Node<T>* current = first;
-
-            for (int i=0;current != nullptr && i<index ;++i){
-                current = current->following;
-            }
-
-            //Eliminar el unico nodo
-            if(first == last){
-                first = nullptr;
-                last = nullptr;
-            }
-            //Eliminar primer nodo
-            else if(current == first){
-                first = first->following;
-                first->former = nullptr;
-            }
-            //Eliminar ultimo nodo.
-            
-            else if (current == last) {
-                last = last->former;
-                if (last != nullptr) {
-                    last->following = nullptr;
-                    }
-            }
-            //eliminar nodo intermedio
-            else{
-                current->former->following = current->following;
-                current->following->former = current->former;
-            }
-            _size -=1;
+    void clear() {
+        Node<T>* current = head;
+        while (current != nullptr) {
+            Node<T>* nextNode = current->next;
             delete current;
-            return;
+            current = nextNode;
         }
+        head = nullptr;
+        tail = nullptr;
+        _size = 0;
+    }
 
-        std::string toString() const{
-            std::ostringstream txt;
-            Node<T>* current = first;
-            bool firstElement = true;
+    //----- Representación en String -----
+    std::string toString() const {
+        std::ostringstream txt;
+        Node<T>* current = head;
+        bool firstElement = true;
 
-            while (current != nullptr) {
-                if (!firstElement) {
-                    txt << " <-> ";
-                }  
-                txt << "[";
-                txt << current->date;
-                current = current->following;
-                firstElement = false;
-                txt<< "]";
-            }
-            return txt.str();
+        while (current != nullptr) {
+            if (!firstElement) {
+                txt << " <-> ";
+            }  
+            txt << "[" << current->date << "]";
+            current = current->next;
+            firstElement = false;
         }
-
+        return txt.str();
+    }
 };
 #endif
