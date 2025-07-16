@@ -35,10 +35,10 @@ public:
     //----- Evitando copias -----
 
     //Evita que se pueda copiar esta lista de esta forma: LinkedList<int> lista3(lista1);
-    LinkedList(const LinkedList&) = delete;
+    LinkedList(LinkedList&&) = delete;
 
     //Evita que se pueda hacer copia por asignacion : lista2 = lista1;
-    LinkedList& operator=(const LinkedList&)=delete;
+    LinkedList& operator=(LinkedList&&)=delete;
 
     //----- Operaciones Básicas -----
     int size() const {
@@ -74,7 +74,7 @@ public:
     }
 
     //----- Añadir Elementos -----
-    void add(const T&& date) {
+    void add(T&& date) {
         Node<T>* newNode = new Node<T>(date, tail, nullptr);
         _size++;
 
@@ -86,7 +86,7 @@ public:
         }
     }
 
-    void addFirst(const T&& date) {
+    void addFirst(T&& date) {
         Node<T>* newNode = new Node<T>(date, nullptr, head);
         _size++;
         if (head == nullptr) {
@@ -97,7 +97,7 @@ public:
         head = newNode;
     }
 
-    void set(int index, const T&& elem) {
+    void set(int index, T&& elem) {
         this->get(index) = elem;
     }
 
@@ -137,8 +137,11 @@ public:
 
         // Caso 1: Único nodo
         if (head == tail) {
+            --_size;
+            delete current;
             head = nullptr;
             tail = nullptr;
+            return;
         }
         // Caso 2: Eliminar head
         else if (current == head) {
