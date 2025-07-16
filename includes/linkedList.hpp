@@ -1,9 +1,20 @@
 #ifndef LINKEDLIST_HPP
 #define LINKEDLIST_HPP
 
-#include "node.hpp"
 #include <stdexcept>
 #include <sstream>
+
+
+template<typename T>
+struct Node{
+    T date;
+    Node<T>* prev;
+    Node<T>* next;
+
+    Node(const T& date, Node<T>* prev, Node<T>* next)
+        : date(date), prev(prev), next(next) {}
+};
+
 
 template<typename T>
 class LinkedList {
@@ -26,7 +37,11 @@ public:
         return _size;
     }
 
-    bool contains(T elem) {
+    bool empty()const{
+        return _size == 0;
+    }
+
+    bool contains(T elem) const {
         Node<T>* current = head;
         while (current != nullptr) {
             if (current->date == elem) {
@@ -37,7 +52,7 @@ public:
         return false;
     }
 
-    int indexOf(T elem) {
+    int indexOf(T elem) const {
         Node<T>* current = head;
         int index = 0;
         while (current != nullptr) {
@@ -51,7 +66,7 @@ public:
     }
 
     //----- Añadir Elementos -----
-    void add(const T& date) {
+    void add(const T&& date) {
         Node<T>* newNode = new Node<T>(date, tail, nullptr);
         _size++;
 
@@ -63,7 +78,7 @@ public:
         }
     }
 
-    void addFirst(const T& date) {
+    void addFirst(const T&& date) {
         Node<T>* newNode = new Node<T>(date, nullptr, head);
         _size++;
         if (head == nullptr) {
@@ -74,7 +89,7 @@ public:
         head = newNode;
     }
 
-    void set(int index, const T& elem) {
+    void set(int index, const T&& elem) {
         this->get(index) = elem;
     }
 
@@ -88,15 +103,19 @@ public:
         return current->date;
     }
 
-    T& getFirst() {
+    T& getFirst() const {
         if (head == nullptr) throw std::out_of_range("Empty list: no head element");
         return head->date;
     }
 
-    T& getLast() {
+    T& getLast() const {
         if (tail == nullptr) throw std::out_of_range("Empty list: no tail element");
         return tail->date;
     }
+
+    T& operator[](int index) {return get(index);}
+
+    const T& operator[](int index) const{return get(index);}
 
     //----- Eliminar Elementos -----
     void removeAt(int index) {
@@ -147,6 +166,14 @@ public:
         _size = 0;
     }
 
+    void push_back(const T& elem){add(elem);}
+
+    void push_front(const T& elem){addFirst(elem);}
+
+    void pop_back(){removeAt(size() - 1);}
+
+    void pop_front(){removeAt(0);}
+
     //----- Representación en String -----
     std::string toString() const {
         std::ostringstream txt;
@@ -165,7 +192,7 @@ public:
     }
 
     //----- Iterador -----
-    
+   
     class Iterador {
         private:
             Node<T>* currentNode;
@@ -187,5 +214,13 @@ public:
     Iterador begin(){return Iterador(head);}
 
     Iterador end(){return Iterador(nullptr);}
+
+    template<typename Predicate>
+    const Iterador find_if(Predicate p){
+        for(auto it = begin();it!=end();++it){
+            if(p(*it))return it;
+        }
+        return end();
+    }
 };
 #endif
