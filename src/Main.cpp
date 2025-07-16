@@ -20,7 +20,4 @@ int main(){
     }
 
     std::cout<<"Accediendo como un array a la lista : " << lista[2]<<endl;
-
-
-
 }

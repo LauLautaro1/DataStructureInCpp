@@ -32,6 +32,14 @@ public:
         clear();
     }
 
+    //----- Evitando copias -----
+
+    //Evita que se pueda copiar esta lista de esta forma: LinkedList<int> lista3(lista1);
+    LinkedList(const LinkedList&) = delete;
+
+    //Evita que se pueda hacer copia por asignacion : lista2 = lista1;
+    LinkedList& operator=(const LinkedList&)=delete;
+
     //----- Operaciones Básicas -----
     int size() const {
         return _size;
