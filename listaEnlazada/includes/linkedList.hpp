@@ -163,5 +163,29 @@ public:
         }
         return txt.str();
     }
+
+    //----- Iterador -----
+    
+    class Iterador {
+        private:
+            Node<T>* currentNode;
+
+        public:
+
+            Iterador(Node<T>* node):currentNode(node){}
+            
+            //Operator sirve para definir el corpotamiento de por ejemplo cuando ponemos ++lista.
+
+            T& operator*(){return currentNode->date;}
+
+            Iterador& operator++(){currentNode = currentNode->next;return *this;}
+
+            bool operator!=(const Iterador& other)const{return currentNode != other.currentNode;}
+            
+    };
+
+    Iterador begin(){return Iterador(head);}
+
+    Iterador end(){return Iterador(nullptr);}
 };
 #endif
