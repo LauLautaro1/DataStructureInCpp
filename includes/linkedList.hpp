@@ -13,6 +13,9 @@ struct Node{
 
     Node(const T& date, Node<T>* prev, Node<T>* next)
         : date(date), prev(prev), next(next) {}
+
+    Node(T&& date, Node<T>* prev, Node<T>* next)
+        : date(std::move(date)), prev(prev), next(next) {}
 };
 
 
@@ -28,17 +31,29 @@ public:
     //----- Constructor y Destructor -----
     LinkedList() : _size(0), head(nullptr), tail(nullptr) {}
 
+    LinkedList(LinkedList&& other) noexcept : _size(other._size) , head(other.head) , tail(other.tail){
+        other._size = 0;
+        other.head = nullptr;
+        other.tail = nullptr;
+    }
+
+    LinkedList& operator=(LinkedList&& other) noexcept {
+        if (this != &other) {
+            clear();
+            _size = other._size;
+            head = other.head;
+            tail = other.tail;
+
+            other._size = 0;
+            other.head = nullptr;
+            other.tail = nullptr;
+        }
+        return *this;
+    }
+
     ~LinkedList() {
         clear();
     }
-
-    //----- Evitando copias -----
-
-    //Evita que se pueda copiar esta lista de esta forma: LinkedList<int> lista3(lista1);
-    LinkedList(LinkedList&&) = delete;
-
-    //Evita que se pueda hacer copia por asignacion : lista2 = lista1;
-    LinkedList& operator=(LinkedList&&)=delete;
 
     //----- Operaciones Básicas -----
     int size() const {
@@ -74,7 +89,7 @@ public:
     }
 
     //----- Añadir Elementos -----
-    void add(T&& date) {
+    void add(const T& date) {
         Node<T>* newNode = new Node<T>(date, tail, nullptr);
         _size++;
 
@@ -86,10 +101,33 @@ public:
         }
     }
 
-    void addFirst(T&& date) {
+    void add(T&& date){
+        Node<T>* newNode = new Node<T>(std::move(date) , tail , nullptr);
+        _size++;
+
+        if(tail == nullptr){
+            head = tail = newNode;
+        } else {
+            tail->next = newNode;
+            tail = newNode;
+        }
+    }
+
+    void addFirst(const T& date) {
         Node<T>* newNode = new Node<T>(date, nullptr, head);
         _size++;
         if (head == nullptr) {
+            head = tail = newNode;
+            return;
+        }
+        head->prev = newNode;
+        head = newNode;
+    }
+
+    void addFirst(T&& date){
+        Node<T>* newNode = new Node<T>(std::move(date), nullptr , head);
+        _size++;
+        if(head == nullptr){
             head = tail = newNode;
             return;
         }
@@ -101,12 +139,29 @@ public:
         this->get(index) = elem;
     }
 
+    void push_back(const T& elem){add(elem);}
+
+    void push_back(T&& elem){add(std::move(elem));}
+
+    void push_front(const T& elem){addFirst(elem);}
+
+    void push_front(T&& elem){addFirst(std::move(elem));}
+
     //----- Obtener Elementos -----
     T& get(int index) const {
         if (index < 0 || index >= _size) throw std::out_of_range("Invalid index");
-        Node<T>* current = head;
-        for (int i = 0; current != nullptr && i < index; ++i) {
-            current = current->next;
+        Node<T>* current;
+
+        if(index <= _size / 2){
+            current = head;
+            for (int i = 0; current != nullptr && i < index; ++i) {
+                current = current->next;
+            }
+        }else{
+            current = tail;
+            for (int i = size()-1; current != nullptr && i > index; --i) {
+                current = current->prev;
+            }
         }
         return current->date;
     }
@@ -119,6 +174,82 @@ public:
     T& getLast() const {
         if (tail == nullptr) throw std::out_of_range("Empty list: no tail element");
         return tail->date;
+    }
+
+    T&& extractFirst(){
+        if (head == nullptr) throw std::out_of_range("Empty list: no head element");
+
+        Node<T>* extract = head;
+        T&& dateReturn = std::move(head->date);
+
+        if(head == tail){
+            head = nullptr;
+            tail = nullptr;
+        }
+        else{
+            head = head->next;
+            head->prev = nullptr;
+        }
+        _size--;
+        delete extract;
+        return std::move(dateReturn);
+    }
+
+    T&& extract(const int index){ 
+        if (index < 0 || index >= _size) throw std::out_of_range("Invalid index");
+
+        Node<T>* current;
+
+        if (index <= _size / 2) {
+            current = head;
+            for (int i = 0; i < index; ++i) {
+                current = current->next;
+            }
+        } else {
+            current = tail;
+            for (int i = _size - 1; i > index; --i) {
+                current = current->prev;
+            }
+        }
+
+        T&& dateReturn = std::move(current->date);
+
+        if(current == head && current == tail){
+            head = nullptr;
+            tail = nullptr;
+        }if(current == head){
+            head = head->next;
+        }if(current == tail){
+            tail = tail->next;
+            tail->prev = nullptr;
+        }else{
+            current->next->prev = current->prev;
+            current->prev->next = current->next;
+        }
+
+        _size--;
+        delete current;
+        return std::move(dateReturn);
+    }
+
+    T&& extractLast(){
+        if (tail == nullptr) throw std::out_of_range("Empty list: no tail element");
+
+        Node<T>* extract = tail;
+        T&& dateReturn = std::move(tail->date);
+
+        if(head == tail){
+            head = nullptr;
+            tail = nullptr;
+        }
+        else{
+            tail = tail->prev;
+            if (tail) tail->next = nullptr;
+        }
+
+        _size--;
+        delete extract;
+        return std::move(dateReturn);
     }
 
     T& operator[](int index) {return get(index);}
@@ -176,10 +307,6 @@ public:
         tail = nullptr;
         _size = 0;
     }
-
-    void push_back(const T& elem){add(elem);}
-
-    void push_front(const T& elem){addFirst(elem);}
 
     void pop_back(){removeAt(size() - 1);}
 
